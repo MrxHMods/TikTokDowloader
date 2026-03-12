@@ -316,37 +316,6 @@
             color: #4b5563;
         }
 
-        .url-examples {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .url-example {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 14px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #94a3b8;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .url-example:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .url-example i {
-            color: #00f2fe;
-        }
-
         .server-status {
             display: flex;
             gap: 12px;
@@ -791,18 +760,9 @@
                     <input 
                         type="url" 
                         id="tiktokUrl" 
-                        placeholder="Masukkan URL TikTok (contoh: https://www.tiktok.com/@user/video/123456789)"
-                        value="https://www.tiktok.com/@tiktok/video/7106542849870392578"
+                        placeholder="Masukkan URL TikTok"
+                        value=""
                     >
-                </div>
-                
-                <div class="url-examples">
-                    <span class="url-example" onclick="setExample('https://www.tiktok.com/@tiktok/video/7106542849870392578')">
-                        <i class="fab fa-tiktok"></i> Contoh Video Biasa
-                    </span>
-                    <span class="url-example" onclick="setExample('https://vm.tiktok.com/ZS8XxXxXx/')">
-                        <i class="fas fa-bolt"></i> Contoh TikTok Lite
-                    </span>
                 </div>
 
                 <div class="server-status" id="serverStatus">
@@ -1253,11 +1213,6 @@
 
         function hideResult() {
             document.getElementById('resultSection').style.display = 'none';
-        }
-
-        function setExample(url) {
-            document.getElementById('tiktokUrl').value = url;
-            toast.info('Contoh URL', 'URL contoh telah diisi, silakan klik download');
         }
 
         function updateApiStatus(status, message) {
