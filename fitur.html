@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitur - TikTok Downloader Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #0f0f1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 4px solid;
+            animation: slideIn 0.3s forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        .toast.info {
+            border-left-color: #3b82f6;
+        }
+
+        .toast.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .toast.success .toast-icon {
+            background: #10b98120;
+            color: #10b981;
+        }
+
+        .toast.error .toast-icon {
+            background: #ef444420;
+            color: #ef4444;
+        }
+
+        .toast.info .toast-icon {
+            background: #3b82f620;
+            color: #3b82f6;
+        }
+
+        .toast.warning .toast-icon {
+            background: #f59e0b20;
+            color: #f59e0b;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .toast-close {
+            cursor: pointer;
+            color: #9ca3af;
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+
+        .toast-close:hover {
+            color: #4b5563;
+        }
+
+        /* Header */
+        .main-header {
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            background: linear-gradient(135deg, #ff0050, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo h2 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #94a3b8;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            padding: 8px 16px;
+            border-radius: 50px;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-menu a i {
+            font-size: 14px;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 60px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            color: white;
+            font-size: 3em;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .page-header h1 i {
+            background: linear-gradient(135deg, #ff0050, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-right: 10px;
+        }
+
+        .page-header p {
+            color: #94a3b8;
+            font-size: 1.2em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 40px 30px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+            animation-fill-mode: both;
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4158D0, #C850C0);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(65,88,208,0.2), rgba(200,80,192,0.2));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-icon i {
+            font-size: 32px;
+            background: linear-gradient(135deg, #4158D0, #C850C0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card h3 {
+            color: white;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #94a3b8;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            color: #94a3b8;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li i {
+            color: #10b981;
+            font-size: 14px;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            animation: fadeInUp 0.6s ease 0.7s both;
+        }
+
+        .stat-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .stat-number {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 1em;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            text-align: center;
+            color: white;
+            font-size: 2.2em;
+            margin-bottom: 40px;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #4158D0, #C850C0);
+            border-radius: 3px;
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .step-item {
+            text-align: center;
+            position: relative;
+            animation: fadeInUp 0.6s ease;
+            animation-fill-mode: both;
+        }
+
+        .step-item:nth-child(1) { animation-delay: 0.8s; }
+        .step-item:nth-child(2) { animation-delay: 0.9s; }
+        .step-item:nth-child(3) { animation-delay: 1s; }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4158D0, #C850C0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 10px 20px -5px rgba(65,88,208,0.3);
+        }
+
+        .step-item:not(:last-child) .step-number::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 100%;
+            width: 200%;
+            height: 2px;
+            background: linear-gradient(90deg, #4158D0, transparent);
+            z-index: 1;
+        }
+
+        .step-item h3 {
+            color: white;
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .step-item p {
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-bottom: 60px;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 30px;
+            transition: all 0.3s;
+            animation: fadeInUp 0.6s ease;
+            animation-fill-mode: both;
+        }
+
+        .faq-item:nth-child(1) { animation-delay: 1.1s; }
+        .faq-item:nth-child(2) { animation-delay: 1.2s; }
+        .faq-item:nth-child(3) { animation-delay: 1.3s; }
+        .faq-item:nth-child(4) { animation-delay: 1.4s; }
+        .faq-item:nth-child(5) { animation-delay: 1.5s; }
+        .faq-item:nth-child(6) { animation-delay: 1.6s; }
+
+        .faq-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .faq-item h3 {
+            color: white;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .faq-item h3 i {
+            color: #4158D0;
+            font-size: 20px;
+        }
+
+        .faq-item p {
+            color: #94a3b8;
+            line-height: 1.7;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 60px;
+            background: linear-gradient(135deg, rgba(65,88,208,0.1), rgba(200,80,192,0.1));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease 1.7s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cta-section h2 {
+            color: white;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .cta-section p {
+            color: #94a3b8;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #4158D0, #C850C0);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(65,88,208,0.5);
+        }
+
+        .cta-button i {
+            font-size: 18px;
+        }
+
+        /* Footer */
+        .creator-footer {
+            text-align: center;
+            padding: 24px;
+            color: #94a3b8;
+            font-size: 14px;
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+
+        .creator-footer .heart {
+            color: #ef4444;
+            animation: heartbeat 1.5s ease infinite;
+            display: inline-block;
+            margin: 0 4px;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .creator-footer .name {
+            font-weight: 600;
+            background: linear-gradient(135deg, #fff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px 20px;
+            }
+
+            .stat-item:not(:last-child)::after {
+                display: none;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .step-item:not(:last-child) .step-number::after {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 16px 20px;
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(15, 15, 26, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 20px;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .page-header h1 {
+                font-size: 2.2em;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-section {
+                padding: 40px 20px;
+            }
+
+            .cta-section h2 {
+                font-size: 1.8em;
+            }
+
+            .toast-container {
+                left: 20px;
+                right: 20px;
+            }
+
+            .toast {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .logo h2 {
+                font-size: 18px;
+            }
+
+            .feature-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fab fa-tiktok"></i>
+                <h2>TikTok Downloader Pro</h2>
+            </div>
+            
+            <div class="menu-toggle" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </div>
+
+            <nav class="nav-menu" id="navMenu">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="fitur.html" class="active"><i class="fas fa-star"></i> Fitur</a>
+                <a href="kontak.html"><i class="fas fa-envelope"></i> Kontak</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-star"></i> Fitur Unggulan</h1>
+                <p>Nikmati berbagai fitur canggih untuk pengalaman download TikTok terbaik</p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="features-grid">
+                <!-- Fitur 1 - Download Video -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Download Video</h3>
+                    <p>Download video TikTok tanpa watermark dengan kualitas HD. Support semua format video TikTok.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Kualitas HD (720p/1080p)</li>
+                        <li><i class="fas fa-check-circle"></i> Tanpa watermark</li>
+                        <li><i class="fas fa-check-circle"></i> Format MP4</li>
+                        <li><i class="fas fa-check-circle"></i> Preview thumbnail</li>
+                    </ul>
+                </div>
+
+                <!-- Fitur 2 - Download Audio -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>Download Audio</h3>
+                    <p>Ekstrak dan download audio dari video TikTok. Cocok untuk nada dering atau koleksi musik.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Format MP3</li>
+                        <li><i class="fas fa-check-circle"></i> Kualitas audio original</li>
+                        <li><i class="fas fa-check-circle"></i> Metadata tetap terjaga</li>
+                        <li><i class="fas fa-check-circle"></i> Download cepat</li>
+                    </ul>
+                </div>
+
+                <!-- Fitur 3 - TikTok Lite Support -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>TikTok Lite Support</h3>
+                    <p>Support semua format URL TikTok termasuk versi Lite (vm.tiktok.com dan vt.tiktok.com).</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> URL pendek otomatis</li>
+                        <li><i class="fas fa-check-circle"></i> Redirect handling</li>
+                        <li><i class="fas fa-check-circle"></i> Support semua region</li>
+                        <li><i class="fas fa-check-circle"></i> 100% kompatibel</li>
+                    </ul>
+                </div>
+
+                <!-- Fitur 4 - Multi-Server -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3>Multi-Server</h3>
+                    <p>3 server berbeda yang bekerja secara bergantian untuk menjamin ketersediaan layanan.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Server TikWM</li>
+                        <li><i class="fas fa-check-circle"></i> Server TikMate</li>
+                        <li><i class="fas fa-check-circle"></i> Server SnapTik</li>
+                        <li><i class="fas fa-check-circle"></i> Auto switch server</li>
+                    </ul>
+                </div>
+
+                <!-- Fitur 5 - Kecepatan Tinggi -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-gauge-high"></i>
+                    </div>
+                    <h3>Kecepatan Tinggi</h3>
+                    <p>Proses download cepat dengan teknologi CDN dan server yang dioptimalkan.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Proses 3-5 detik</li>
+                        <li><i class="fas fa-check-circle"></i> Download parallel</li>
+                        <li><i class="fas fa-check-circle"></i> Optimasi bandwidth</li>
+                        <li><i class="fas fa-check-circle"></i> Cache system</li>
+                    </ul>
+                </div>
+
+                <!-- Fitur 6 - Aman & Gratis -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Aman & Gratis</h3>
+                    <p>Layanan 100% gratis dan aman. Tidak ada data pribadi yang disimpan.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Gratis selamanya</li>
+                        <li><i class="fas fa-check-circle"></i> Tanpa login</li>
+                        <li><i class="fas fa-check-circle"></i> Privasi terjaga</li>
+                        <li><i class="fas fa-check-circle"></i> Tanpa malware</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div class="stats-section">
+                <div class="stat-item">
+                    <div class="stat-number">1M+</div>
+                    <div class="stat-label">Video Downloaded</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500K+</div>
+                    <div class="stat-label">Happy Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Active Servers</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+            </div>
+
+            <!-- How It Works -->
+            <div class="how-it-works">
+                <h2 class="section-title">Cara Kerja</h2>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <h3>Copy URL</h3>
+                        <p>Buka aplikasi TikTok, cari video yang ingin didownload, lalu copy URL-nya</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <h3>Paste & Proses</h3>
+                        <p>Paste URL di kolom input, sistem akan otomatis memproses video</p>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <h3>Download</h3>
+                        <p>Klik tombol download dan video siap disimpan ke perangkat Anda</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <h2 class="section-title">Pertanyaan Umum</h2>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3><i class="fas fa-question-circle"></i> Apakah layanan ini gratis?</h3>
+                        <p>Ya, TikTok Downloader Pro 100% gratis dan akan selalu gratis. Tidak ada biaya tersembunyi.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3><i class="fas fa-question-circle"></i> Apakah perlu install aplikasi?</h3>
+                        <p>Tidak perlu install apapun. Cukup akses website melalui browser dan langsung gunakan.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3><i class="fas fa-question-circle"></i> Format video apa yang didukung?</h3>
+                        <p>Video tersedia dalam format MP4 dengan kualitas HD tanpa watermark.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3><i class="fas fa-question-circle"></i> Bagaimana jika server error?</h3>
+                        <p>Sistem akan otomatis berpindah ke server cadangan jika satu server mengalami masalah.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3><i class="fas fa-question-circle"></i> Apakah bisa download audio saja?</h3>
+                        <p>Ya, tersedia opsi download audio dalam format MP3 berkualitas tinggi.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3><i class="fas fa-question-circle"></i> Support TikTok Lite?</h3>
+                        <p>Ya, support semua format URL termasuk vm.tiktok.com dan vt.tiktok.com.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="cta-section">
+                <h2>Siap Mencoba?</h2>
+                <p>Download video TikTok tanpa watermark sekarang juga. Gratis dan tanpa ribet!</p>
+                <a href="index.html" class="cta-button">
+                    <i class="fas fa-download"></i>
+                    Mulai Download
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="creator-footer">
+        <p>
+            Dibuat dengan <span class="heart"><i class="fas fa-heart"></i></span> oleh 
+            <span class="name">Husni Aljalil</span> 
+            <i class="fas fa-code"></i> | 2026
+        </p>
+    </footer>
+
+    <script>
+        // Toast System
+        class Toast {
+            constructor() {
+                this.container = document.getElementById('toastContainer');
+            }
+
+            show({ title, message, type = 'info', duration = 5000 }) {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                
+                const icons = {
+                    success: 'fa-check-circle',
+                    error: 'fa-exclamation-circle',
+                    warning: 'fa-exclamation-triangle',
+                    info: 'fa-info-circle'
+                };
+
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="fas ${icons[type]}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <div class="toast-close" onclick="this.closest('.toast').remove()">
+                        <i class="fas fa-times"></i>
+                    </div>
+                `;
+
+                this.container.appendChild(toast);
+
+                // Auto remove after duration
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.style.animation = 'slideIn 0.3s reverse';
+                        setTimeout(() => toast.remove(), 300);
+                    }
+                }, duration);
+            }
+
+            success(title, message) {
+                this.show({ title, message, type: 'success' });
+            }
+
+            error(title, message) {
+                this.show({ title, message, type: 'error', duration: 7000 });
+            }
+
+            warning(title, message) {
+                this.show({ title, message, type: 'warning' });
+            }
+
+            info(title, message) {
+                this.show({ title, message, type: 'info' });
+            }
+        }
+
+        // Initialize Toast
+        const toast = new Toast();
+
+        // Toggle menu untuk mobile
+        function toggleMenu() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        }
+
+        // Tutup menu saat klik di luar
+        document.addEventListener('click', function(event) {
+            const navMenu = document.getElementById('navMenu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                navMenu.classList.remove('active');
+            }
+        });
+
+        // Smooth scroll untuk anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+                document.getElementById('navMenu').classList.remove('active');
+            });
+        });
+
+        // Animasi counter untuk stats
+        function animateStats() {
+            const stats = document.querySelectorAll('.stat-number');
+            stats.forEach(stat => {
+                const text = stat.textContent;
+                if (text.includes('+')) {
+                    const value = parseInt(text.replace(/[^0-9]/g, ''));
+                    let current = 0;
+                    const increment = value / 50;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= value) {
+                            stat.textContent = text;
+                            clearInterval(timer);
+                        } else {
+                            stat.textContent = Math.floor(current) + '+';
+                        }
+                    }, 20);
+                } else if (text.includes('%')) {
+                    const value = parseFloat(text.replace('%', ''));
+                    let current = 0;
+                    const increment = value / 50;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= value) {
+                            stat.textContent = text;
+                            clearInterval(timer);
+                        } else {
+                            stat.textContent = current.toFixed(1) + '%';
+                        }
+                    }, 20);
+                }
+            });
+        }
+
+        // Welcome toast saat halaman dimuat
+        window.addEventListener('load', function() {
+            animateStats();
+            setTimeout(() => {
+                toast.success('Selamat Datang', 'Jelajahi fitur-fitur keren TikTok Downloader Pro!');
+            }, 1000);
+        });
+
+        // Intersection Observer untuk animasi scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .stat-item, .step-item, .faq-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
